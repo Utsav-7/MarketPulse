@@ -1,0 +1,6 @@
+@MarketPulse.API_HostAddress = http://localhost:5167
+
+GET {{MarketPulse.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
