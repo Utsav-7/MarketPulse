@@ -1,9 +1,7 @@
 # MarketPulse
 
 <!-- Add your logo or screenshot below (e.g. docs/logo.png or docs/screenshot.png) -->
-<p align="center">
-  <img src="docs/logo.png" alt="MarketPulse" width="300" />
-</p>
+<img width="1920" height="2031" alt="screencapture-localhost-5173-dashboard-2026-02-22-19_38_28" src="https://github.com/user-attachments/assets/28328863-7089-4dbe-921f-a49ce8296b30" />
 
 ---
 
