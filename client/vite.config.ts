@@ -5,13 +5,13 @@ import react from '@vitejs/plugin-react'
 // e.g. https://utsav-7.github.io/MarketPulse/
 const REPO_NAME = 'MarketPulse'
 
-const isGitHubPages = process.env.GITHUB_ACTIONS === 'true'
-
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  // In GitHub Pages the app lives at /<repo-name>/
-  base: isGitHubPages ? `/${REPO_NAME}/` : '/',
+  // In CI (GitHub Actions) set base to /<repo>/, otherwise serve from /
+  base: mode === 'production' && process.env['GITHUB_ACTIONS'] === 'true'
+    ? `/${REPO_NAME}/`
+    : '/',
   server: {
     port: 5173,
     proxy: {
@@ -21,4 +21,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { NewsItem, WeatherCity } from '../data/dashboardDummyData';
+import type { NewsItem } from '../data/dashboardDummyData';
 import {
   getNewsByCard,
   getWeather,

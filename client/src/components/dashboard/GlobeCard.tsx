@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type * as ThreeTypes from 'three';
 
 // ── Solar subsolar-point ─────────────────────────────────────────────────────
 function getSolarLatLng(date: Date): { lat: number; lng: number } {
@@ -119,7 +120,7 @@ export function GlobeCard() {
     const globe = globeRef.current;
     if (!globe) return;
 
-    import('three').then((THREE) => {
+    import('three').then((THREE: typeof ThreeTypes) => {
       const loader = new THREE.TextureLoader();
       Promise.all([
         loader.loadAsync('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),

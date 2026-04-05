@@ -45,8 +45,6 @@ import {
 import {
   NEWS_CATEGORIES,
   useLiveNews,
-  useLiveNewsByCategory,
-  useLiveNewsByQuery,
   useBackendNews,
   useLiveWeather,
   useSectorPerformance,
@@ -157,7 +155,6 @@ export function DashboardPage() {
   const [weatherCity, setWeatherCity] = useState('');
   const { data: liveWeatherData, loading: weatherLoading } = useLiveWeather(weatherCity);
 
-  const liveNewsItems = liveNewsByRegion[liveNewsRegion] ?? liveNewsByRegion.All;
   const videoId = liveNewsVideoIds[videoRegion] ?? liveNewsVideoIds.All;
   const webcamId = liveWebcamIds[webcamLocation] ?? liveWebcamIds.Mideast;
 
