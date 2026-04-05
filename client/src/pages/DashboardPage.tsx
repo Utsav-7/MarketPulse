@@ -1,16 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import GridLayout, { useContainerWidth } from 'react-grid-layout';
-import { useAuth } from '../context/AuthContext';
 import {
   getExchangeCountries,
   getExchangesByCountry,
-  ApiError,
   type CountryDto,
   type ExchangeDto,
 } from '../api/client';
-import { PageLoader } from '../components/common';
 import {
   DashboardCard,
   DashboardHeader,
@@ -113,7 +109,6 @@ function saveLayout(layout: LayoutItem[]) {
 }
 
 export function DashboardPage() {
-  const { username, logout, isAuthenticated, isLoading } = useAuth();
   const { width, containerRef, mounted } = useContainerWidth();
   const [layout, setLayout] = useState<LayoutItem[]>(loadStoredLayout);
   const [countries, setCountries] = useState<CountryDto[]>([]);
@@ -126,7 +121,6 @@ export function DashboardPage() {
   const [liveNewsRegion, setLiveNewsRegion] = useState<string>('All');
   const [videoRegion, setVideoRegion] = useState<string>('All');
   const [webcamLocation, setWebcamLocation] = useState<string>('All');
-  const navigate = useNavigate();
 
   // Main news card — GNews (frontend key)
   const { items: newsToShow } = useLiveNews(newsCategory, dummyNews);
@@ -170,15 +164,8 @@ export function DashboardPage() {
   const loadCountries = useCallback(() => {
     return getExchangeCountries()
       .then(setCountries)
-      .catch((err) => {
-        if (err instanceof ApiError && err.status === 401) {
-          logout();
-          navigate('/login', { replace: true });
-        } else {
-          toast.error('Failed to load countries.');
-        }
-      });
-  }, [logout, navigate]);
+      .catch(() => toast.error('Failed to load countries.'));
+  }, []);
 
   const loadExchanges = useCallback(() => {
     return getExchangesByCountry(selectedCountry || null)
@@ -187,22 +174,14 @@ export function DashboardPage() {
   }, [selectedCountry]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/login', { replace: true });
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
     setLoadingCountries(true);
     loadCountries().finally(() => setLoadingCountries(false));
-  }, [isAuthenticated, loadCountries]);
+  }, [loadCountries]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
     setLoadingExchanges(true);
     loadExchanges().finally(() => setLoadingExchanges(false));
-  }, [isAuthenticated, selectedCountry, loadExchanges]);
+  }, [selectedCountry, loadExchanges]);
 
   const handleLayoutChange = useCallback((newLayout: ReadonlyArray<LayoutItem>) => {
     const next = newLayout.map((item) => ({ i: item.i, x: item.x, y: item.y, w: item.w, h: item.h }));
@@ -214,14 +193,6 @@ export function DashboardPage() {
     setRefreshing(true);
     Promise.all([loadCountries(), loadExchanges()]).finally(() => setRefreshing(false));
   };
-
-  const handleLogout = () => {
-    logout();
-    toast.success('Signed out successfully.');
-    navigate('/login', { replace: true });
-  };
-
-  if (isLoading || !isAuthenticated) return <PageLoader />;
 
   const countryDropdown = (
     <select
@@ -246,7 +217,7 @@ export function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background-primary">
-      <DashboardHeader username={username} onLogout={handleLogout} />
+      <DashboardHeader />
 
       <div className="w-full border-b border-border bg-background-secondary px-3 py-2">
         <input

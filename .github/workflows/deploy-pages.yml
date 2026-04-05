@@ -3,9 +3,6 @@ name: Deploy Dashboard to GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'client/**'
-      - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -20,9 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
 
     steps:
       - name: Checkout
@@ -32,18 +26,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: client/package-lock.json
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        working-directory: client
+        run: npm install --legacy-peer-deps
 
       - name: Build
+        working-directory: client
         env:
-          # Point the client at the deployed backend API
-          # Set this secret in: Settings → Secrets → Actions → VITE_API_URL
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_GNEWS_API_KEY: ${{ secrets.VITE_GNEWS_API_KEY }}
+          # VITE_API_URL intentionally omitted — dashboard is public, no backend needed
         run: npm run build
 
       - name: Upload Pages artifact
