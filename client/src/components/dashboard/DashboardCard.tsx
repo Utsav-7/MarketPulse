@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface DashboardCardProps {
   title: string;
   badge?: string;
+  /** When true, shows a pulsing red live dot in the top-right corner */
+  live?: boolean;
   headerRight?: ReactNode;
   onRefresh?: () => void;
   refreshing?: boolean;
@@ -12,9 +15,35 @@ interface DashboardCardProps {
   className?: string;
 }
 
+/** Blinking red dot that alternates visible/hidden every 1.2 s */
+function LiveDot() {
+  const [visible, setVisible] = useState(true);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    timerRef.current = setTimeout(function tick() {
+      setVisible((v) => !v);
+      timerRef.current = setTimeout(tick, 1200);
+    }, 1200);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  return (
+    <span
+      aria-label="Live data"
+      title="Live data"
+      className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 shadow-[0_0_4px_1px_rgba(239,68,68,0.7)] transition-opacity duration-300"
+      style={{ opacity: visible ? 1 : 0 }}
+    />
+  );
+}
+
 export function DashboardCard({
   title,
   badge,
+  live = false,
   headerRight,
   onRefresh,
   refreshing,
@@ -24,8 +53,9 @@ export function DashboardCard({
 }: DashboardCardProps) {
   return (
     <div
-      className={`flex h-full min-h-0 flex-col rounded-lg border border-border bg-background-secondary overflow-hidden ${className}`}
+      className={`relative flex h-full min-h-0 flex-col rounded-lg border border-border bg-background-secondary overflow-hidden ${className}`}
     >
+      {live && <LiveDot />}
       <div className="flex flex-shrink-0 items-center justify-between gap-2 border-b border-border bg-background-primary px-3 py-1.5">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           {dragHandle && (

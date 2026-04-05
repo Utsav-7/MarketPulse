@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth, ApiError } from '../context/AuthContext';
-import { Button, CodeInput } from '../components/common';
+import { Button, CodeInput, MarketPulseLogo } from '../components/common';
 
 const LOGIN_CODE_REGEX = /^[A-Za-z0-9]{6}$/;
 
@@ -55,11 +55,7 @@ export function LoginPage() {
       <div className="w-full max-w-md">
         <div className="rounded-xl border border-border bg-background-secondary p-8 shadow-xl">
           <div className="mb-8 flex flex-col items-center text-center">
-            <img
-              src="/Images/transparent-logo.svg"
-              alt="MarketPulse"
-              className="h-14 w-auto object-contain"
-            />
+            <MarketPulseLogo size="lg" />
             <h1 className="mt-4 text-2xl font-bold tracking-tight text-text-primary">MarketPulse</h1>
             <p className="mt-2 text-sm text-text-secondary">Real-Time Financial Market Tracker</p>
           </div>

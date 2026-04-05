@@ -135,3 +135,87 @@ export async function createUser(payload: CreateUserRequest): Promise<CreateUser
     }),
   });
 }
+
+// ── Weather ─────────────────────────────────────────────────────────────────
+
+export interface WeatherResult {
+  city: string;
+  country: string;
+  tempC: number;
+  feelsLikeC: number;
+  humidity: number;
+  windKmh: number;
+  condition: string;
+  icon: string;
+  highC: number;
+  lowC: number;
+}
+
+export async function getWeather(city: string): Promise<WeatherResult> {
+  return apiRequest<WeatherResult>(`/api/weather?city=${encodeURIComponent(city)}`);
+}
+
+// ── News (backend-proxied NewsAPI) ───────────────────────────────────────────
+
+export interface BackendNewsArticle {
+  source: string;
+  headline: string;
+  url: string;
+  publishedAt: string;
+}
+
+export async function getNewsByCard(card: string): Promise<BackendNewsArticle[]> {
+  return apiRequest<BackendNewsArticle[]>(`/api/news?card=${encodeURIComponent(card)}`);
+}
+
+// ── Stock Indexes (Yahoo Finance) ────────────────────────────────────────────
+
+export interface IndexQuoteDto {
+  symbol: string;
+  name: string;
+  country: string;
+  value: number;
+  changePercent: number;
+}
+
+export async function getIndexes(): Promise<IndexQuoteDto[]> {
+  return apiRequest<IndexQuoteDto[]>('/api/indexes');
+}
+
+// ── Crypto (CoinGecko) ───────────────────────────────────────────────────────
+
+export interface CryptoPriceDto {
+  symbol: string;
+  name: string;
+  price: number;
+  changePercent: number;
+  marketCap: number;
+}
+
+export async function getCrypto(): Promise<CryptoPriceDto[]> {
+  return apiRequest<CryptoPriceDto[]>('/api/crypto');
+}
+
+// ── Commodities (EIA + fallback) ─────────────────────────────────────────────
+
+export interface CommodityPriceDto {
+  symbol: string;
+  name: string;
+  price: number;
+  changePercent: number;
+}
+
+export async function getCommodities(): Promise<CommodityPriceDto[]> {
+  return apiRequest<CommodityPriceDto[]>('/api/commodities');
+}
+
+// ── Sector Heatmap (Alpha Vantage) ────────────────────────────────────────────
+
+export interface SectorPerformance {
+  sector: string;
+  change: number;
+}
+
+export async function getSectorPerformance(): Promise<SectorPerformance[]> {
+  return apiRequest<SectorPerformance[]>('/api/sectors');
+}

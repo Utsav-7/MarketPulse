@@ -1,4 +1,5 @@
 export { Button } from './Button';
+export { MarketPulseLogo } from './MarketPulseLogo';
 export { CodeInput } from './CodeInput';
 export { Grid } from './Grid';
 export { Input } from './Input';

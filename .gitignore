@@ -55,6 +55,9 @@ appsettings.Development.json
 appsettings.*.local.json
 secrets.json
 
+# Claude Code memory / session data
+.claude/
+
 # Test / coverage
 coverage/
 *.lcov

@@ -1,6 +1,8 @@
 export { DashboardCard } from './DashboardCard';
 export { DashboardHeader } from './DashboardHeader';
+export { GlobeCard } from './GlobeCard';
 export { HeadlinesList } from './HeadlinesList';
+export { WorldMapCard } from './WorldMapCard';
 export { IndexCharts } from './IndexCharts';
 export { IndexGrid } from './IndexGrid';
 export { NewsGrid } from './NewsGrid';

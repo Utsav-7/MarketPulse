@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '../common';
+import { Button, MarketPulseLogo } from '../common';
 
 interface DashboardHeaderProps {
   username: string | null;
@@ -34,11 +34,7 @@ export function DashboardHeader({ username, onLogout }: DashboardHeaderProps) {
     <header className="sticky top-0 z-10 border-b border-border bg-background-secondary px-3 py-2">
       <div className="flex w-full flex-wrap items-center justify-between gap-2">
         <div className="flex items-center shrink-0">
-          <img
-            src="/Images/transparent-logo.svg"
-            alt="MarketPulse"
-            className="h-8 w-auto max-h-10 object-contain"
-          />
+          <MarketPulseLogo size="sm" />
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[10px] font-medium uppercase tracking-wide text-text-secondary">

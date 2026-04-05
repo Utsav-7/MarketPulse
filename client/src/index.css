@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet — override z-index so popups sit above dashboard cards */
+.leaflet-pane { z-index: 1 !important; }
+.leaflet-top, .leaflet-bottom { z-index: 2 !important; }
+.leaflet-popup-pane { z-index: 3 !important; }
+.leaflet-control { z-index: 4 !important; }
+
 :root {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
@@ -28,7 +34,27 @@ body {
   min-height: 100vh;
 }
 
-/* Invisible scrollbar — keeps scroll behavior, hides scrollbar */
+/* Thin card scrollbar */
+.scrollbar-card {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+}
+.scrollbar-card::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-card::-webkit-scrollbar-thumb {
+  background-color: #334155;
+  border-radius: 99px;
+}
+.scrollbar-card::-webkit-scrollbar-thumb:hover {
+  background-color: #475569;
+}
+
+/* Invisible scrollbar — kept for backward compat */
 .scrollbar-invisible {
   overflow-y: auto;
   scrollbar-width: none;

@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MarketPulse — Project Ticket &amp; SRS</title>
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-page:      #0b1120;
+      --bg-card:      #111827;
+      --bg-card-alt:  #1a2236;
+      --bg-badge:     #1e3a5f;
+      --border:       #1e3a5f;
+      --border-light: #2a4070;
+      --blue:         #3b82f6;
+      --blue-light:   #60a5fa;
+      --blue-muted:   #1d4ed8;
+      --green:        #10b981;
+      --red:          #ef4444;
+      --amber:        #f59e0b;
+      --purple:       #8b5cf6;
+      --teal:         #14b8a6;
+      --text-primary: #f1f5f9;
+      --text-secondary:#94a3b8;
+      --text-muted:   #64748b;
+      --radius:       10px;
+      --radius-sm:    6px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    a { color: var(--blue-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ───────────────────────────────────────────── */
+    .page-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── Document Header ──────────────────────────────────── */
+    .doc-header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 32px;
+      margin-bottom: 40px;
+    }
+    .doc-header-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .logo-mark span:first-child { color: var(--text-primary); }
+    .logo-mark span:last-child  { color: var(--blue); }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--blue-muted), var(--blue));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .doc-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+    }
+    .meta-item strong { color: var(--text-primary); }
+    .doc-title {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .doc-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+
+    /* ── Status Banner ────────────────────────────────────── */
+    .status-banner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--blue);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 40px;
+    }
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .chip-blue   { background: #1e3a5f; color: var(--blue-light); }
+    .chip-green  { background: #064e3b; color: var(--green); }
+    .chip-amber  { background: #451a03; color: var(--amber); }
+    .chip-red    { background: #450a0a; color: var(--red); }
+    .chip-purple { background: #2e1065; color: #c4b5fd; }
+
+    /* ── Section ──────────────────────────────────────────── */
+    .section {
+      margin-bottom: 48px;
+    }
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-heading .num {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--blue-muted), var(--blue));
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── Cards ────────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ── Grid Layouts ─────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media(max-width: 768px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Tech Stack Tags ──────────────────────────────────── */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin: 2px;
+    }
+    .tag-blue   { background: #1e3a5f; color: var(--blue-light); }
+    .tag-green  { background: #064e3b; color: #34d399; }
+    .tag-purple { background: #2e1065; color: #c4b5fd; }
+    .tag-amber  { background: #451a03; color: var(--amber); }
+    .tag-gray   { background: #1e293b; color: var(--text-secondary); }
+    .tag-teal   { background: #042f2e; color: #5eead4; }
+
+    /* ── Feature Tickets ──────────────────────────────────── */
+    .ticket {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .ticket-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--bg-card-alt);
+      border-bottom: 1px solid var(--border);
+      cursor: default;
+    }
+    .ticket-id {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue-light);
+      background: #1e3a5f;
+      border-radius: 4px;
+      padding: 2px 7px;
+      white-space: nowrap;
+    }
+    .ticket-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .ticket-body {
+      padding: 16px 18px;
+    }
+    .ticket-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .ticket-row:last-child { margin-bottom: 0; }
+    .ticket-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      min-width: 80px;
+    }
+    .ticket-val {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ── API Table ────────────────────────────────────────── */
+    .api-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .api-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--bg-card-alt);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+    .api-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: top;
+    }
+    .api-table tr:last-child td { border-bottom: none; }
+    .api-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .free-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #064e3b;
+      color: #34d399;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+    .limit-note {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    /* ── Progress Bar ─────────────────────────────────────── */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .progress-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      min-width: 160px;
+    }
+    .progress-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--bg-card-alt);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--blue-muted), var(--blue));
+    }
+    .progress-pct {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* ── Phase Timeline ───────────────────────────────────── */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 28px;
+    }
+    .tl-dot {
+      position: absolute;
+      left: -22px;
+      top: 3px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg-card);
+      z-index: 1;
+    }
+    .tl-dot.done   { background: var(--green);  border-color: var(--green); }
+    .tl-dot.active { background: var(--blue);   border-color: var(--blue); }
+    .tl-dot.next   { background: var(--amber);  border-color: var(--amber); }
+    .tl-dot.later  { background: var(--bg-card-alt); border-color: var(--border-light); }
+    .tl-phase {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .tl-phase.done   { color: var(--green); }
+    .tl-phase.active { color: var(--blue-light); }
+    .tl-phase.next   { color: var(--amber); }
+    .tl-phase.later  { color: var(--text-muted); }
+    .tl-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .tl-items {
+      list-style: none;
+      padding: 0;
+    }
+    .tl-items li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 2px 0;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .tl-items li::before {
+      content: '→';
+      color: var(--text-muted);
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    /* ── Checklist ────────────────────────────────────────── */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .check { flex-shrink: 0; margin-top: 1px; }
+    .check.done   { color: var(--green); }
+    .check.todo   { color: var(--text-muted); }
+    .check.wip    { color: var(--amber); }
+
+    /* ── Note Box ─────────────────────────────────────────── */
+    .note-box {
+      background: #1e3a5f22;
+      border: 1px solid #1e3a5f;
+      border-left: 4px solid var(--blue);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .note-box.warn {
+      background: #451a0322;
+      border-color: #451a03;
+      border-left-color: var(--amber);
+    }
+    .note-box strong { color: var(--text-primary); }
+
+    /* ── NFR Table ────────────────────────────────────────── */
+    .nfr-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media(max-width: 600px) { .nfr-grid { grid-template-columns: 1fr; } }
+    .nfr-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+    .nfr-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--blue-light);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nfr-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    .nfr-card li {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 3px 0;
+      display: flex;
+      gap: 6px;
+    }
+    .nfr-card li::before { content: '•'; color: var(--text-muted); }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .doc-footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .doc-footer-left { font-size: 12px; color: var(--text-muted); }
+    .doc-footer-right {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .doc-footer-right span { color: var(--blue-light); font-weight: 600; }
+
+    /* ── ToC ──────────────────────────────────────────────── */
+    .toc {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 40px;
+    }
+    .toc-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .toc ol {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 32px;
+    }
+    @media(max-width: 600px) { .toc ol { grid-template-columns: 1fr; } }
+    .toc li a {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 0;
+    }
+    .toc li a:hover { color: var(--blue-light); text-decoration: none; }
+    .toc-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 18px;
+    }
+
+    code {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      background: #1e293b;
+      color: #7dd3fc;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 32px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ══════════════════════════════════════════════════════
+       DOCUMENT HEADER
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="doc-header">
+    <div class="doc-header-top">
+      <div class="logo-mark">
+        <div class="logo-icon">📈</div>
+        <span>Market</span><span>Pulse</span>
+      </div>
+    </div>
+    <div class="doc-title">Software Requirements Specification &amp; Project Ticket</div>
+    <div class="doc-subtitle">Real-Time Financial Market Tracker — Full-Stack Web Application</div>
+    <div class="doc-meta">
+      <div class="meta-item">📄 <strong>Doc Type:</strong>&nbsp;SRS / Project Ticket</div>
+      <div class="meta-item">📅 <strong>Created:</strong>&nbsp;April 4, 2026</div>
+      <div class="meta-item">🔖 <strong>Version:</strong>&nbsp;1.0</div>
+      <div class="meta-item">🏷️ <strong>Project ID:</strong>&nbsp;MP-2026</div>
+      <div class="meta-item">⚙️ <strong>Status:</strong>&nbsp;In Development</div>
+    </div>
+  </div>
+
+  <!-- Status Banner -->
+  <div class="status-banner">
+    <span class="status-chip chip-green">✓ Auth Complete</span>
+    <span class="status-chip chip-green">✓ Dashboard UI Scaffolded</span>
+    <span class="status-chip chip-blue">⟳ Market Data In Progress</span>
+    <span class="status-chip chip-amber">⚠ Real-Time Pending</span>
+    <span class="status-chip chip-amber">⚠ Charts Pending</span>
+    <span class="status-chip chip-purple">★ Free APIs Only</span>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc">
+    <div class="toc-title">Table of Contents</div>
+    <ol>
+      <li><a href="#s1"><span class="toc-num">1.</span> Project Overview</a></li>
+      <li><a href="#s2"><span class="toc-num">2.</span> Tech Stack</a></li>
+      <li><a href="#s3"><span class="toc-num">3.</span> Free API Catalogue</a></li>
+      <li><a href="#s4"><span class="toc-num">4.</span> Current State</a></li>
+      <li><a href="#s5"><span class="toc-num">5.</span> Feature Tickets</a></li>
+      <li><a href="#s6"><span class="toc-num">6.</span> Dashboard Sections</a></li>
+      <li><a href="#s7"><span class="toc-num">7.</span> Architecture</a></li>
+      <li><a href="#s8"><span class="toc-num">8.</span> Non-Functional Requirements</a></li>
+      <li><a href="#s9"><span class="toc-num">9.</span> Development Phases</a></li>
+      <li><a href="#s10"><span class="toc-num">10.</span> Constraints &amp; Risks</a></li>
+    </ol>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       1. PROJECT OVERVIEW
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s1">
+    <div class="section-heading"><span class="num">1</span> Project Overview</div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">What is MarketPulse?</div>
+        <span class="status-chip chip-blue" style="font-size:11px;">MVP</span>
+      </div>
+      <div class="card-desc">
+        MarketPulse is a <strong style="color:var(--text-primary)">real-time financial market dashboard</strong> that aggregates data
+        across stocks, cryptocurrency, commodities, forex, global indices, and financial news into a single,
+        customisable web interface. Users get a live pulse on global markets through a draggable card-based layout
+        without switching between multiple sites or tools.
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:8px;">🎯 Primary Goal</div>
+        <div class="card-desc">Provide a free, self-hostable market intelligence hub that replaces paid Bloomberg / TradingView subscriptions for retail investors and developers.</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:8px;">👤 Target Users</div>
+        <div class="card-desc">Retail investors, day traders, finance students, and developers who want real-time market data without API subscription costs.</div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:8px;">💡 Key Constraint</div>
+        <div class="card-desc"><strong style="color:var(--amber)">All data APIs must be free-tier.</strong> No paid subscriptions. Rate limits are managed via backend caching and request throttling.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       2. TECH STACK
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s2">
+    <div class="section-heading"><span class="num">2</span> Technology Stack</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">🖥️ Backend</div>
+        <span class="tag tag-blue">.NET 8</span>
+        <span class="tag tag-blue">ASP.NET Core</span>
+        <span class="tag tag-blue">Entity Framework Core 8</span>
+        <span class="tag tag-gray">SQL Server (LocalDB dev)</span>
+        <span class="tag tag-purple">JWT Auth (15-min tokens)</span>
+        <span class="tag tag-teal">Swagger / OpenAPI</span>
+        <span class="tag tag-gray">Clean Architecture</span>
+        <span class="tag tag-amber">HttpClient (external APIs)</span>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">🌐 Frontend</div>
+        <span class="tag tag-blue">React 18</span>
+        <span class="tag tag-blue">TypeScript 5</span>
+        <span class="tag tag-green">Vite 5</span>
+        <span class="tag tag-teal">TailwindCSS 3.4</span>
+        <span class="tag tag-purple">React Router v7</span>
+        <span class="tag tag-amber">React Grid Layout</span>
+        <span class="tag tag-gray">Sonner (toasts)</span>
+        <span class="tag tag-gray">localStorage (state)</span>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>Architecture Pattern:</strong> Clean Architecture (Domain → Application → Infrastructure → API).
+      Frontend communicates through Vite proxy in development (<code>/api → http://localhost:5167</code>).
+      Production will use a reverse proxy (Nginx / IIS).
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       3. FREE API CATALOGUE
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s3">
+    <div class="section-heading"><span class="num">3</span> Free API Catalogue</div>
+
+    <div class="note-box">
+      <strong>★ Project Constraint:</strong> Every external data source used in MarketPulse must be a
+      <strong>free-tier API</strong> — no paid subscriptions, no credit card required. Rate limits are handled
+      server-side via response caching and per-user throttling.
+    </div>
+
+    <!-- Stock & Indices -->
+    <div class="card-title" style="margin-bottom:10px; color:var(--text-secondary); font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">📊 Stocks &amp; Indices</div>
+    <div class="table-wrap" style="margin-bottom:20px;">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>API</th>
+            <th>Data Provided</th>
+            <th>Free Limit</th>
+            <th>Used For (Dashboard Section)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Finnhub</strong><br><span class="limit-note">finnhub.io</span></td>
+            <td>Stock quotes, symbols, company profile, news</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">60 calls/min</span></td>
+            <td>Markets card, India Stocks sync, Exchange listing</td>
+            <td><span class="tag tag-green">Integrated</span></td>
+          </tr>
+          <tr>
+            <td><strong>Yahoo Finance (yfinance)</strong><br><span class="limit-note">via RapidAPI free tier / yfinance lib</span></td>
+            <td>Global indices, historical OHLC, S&amp;P 500, FTSE, DAX</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">Unofficial / scraping-safe</span></td>
+            <td>Stock Indexes card, Charts card</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>Alpha Vantage</strong><br><span class="limit-note">alphavantage.co</span></td>
+            <td>Global equity quotes, forex, technicals, earnings</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">25 calls/day (free key)</span></td>
+            <td>Stock Indexes, Charts (historical data)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>Polygon.io</strong><br><span class="limit-note">polygon.io</span></td>
+            <td>Real-time US stocks, aggregates, options</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">Unlimited delayed (15min)</span></td>
+            <td>US stock quotes, backup index data</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>NSE India (unofficial)</strong><br><span class="limit-note">nseindia.com API</span></td>
+            <td>Live NSE/BSE quotes, Nifty 50, Sensex</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">No auth required</span></td>
+            <td>India Stocks, Nifty/Sensex in indexes card</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Crypto -->
+    <div class="card-title" style="margin-bottom:10px; color:var(--text-secondary); font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">₿ Cryptocurrency</div>
+    <div class="table-wrap" style="margin-bottom:20px;">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>API</th>
+            <th>Data Provided</th>
+            <th>Free Limit</th>
+            <th>Used For (Dashboard Section)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>CoinGecko</strong><br><span class="limit-note">coingecko.com/en/api</span></td>
+            <td>1000+ coins, price, market cap, 24h change, chart history</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">30 calls/min (demo key)</span></td>
+            <td>Crypto card (BTC, ETH, SOL, BNB, XRP, DOGE)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>Binance WebSocket</strong><br><span class="limit-note">api.binance.com</span></td>
+            <td>Real-time tick-by-tick crypto price streams</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">No auth for public streams</span></td>
+            <td>Crypto card (live sub-second updates)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>CoinCap</strong><br><span class="limit-note">coincap.io</span></td>
+            <td>Top 100 coins, WebSocket stream, market cap rank</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">Unlimited public</span></td>
+            <td>Crypto card (fallback / secondary source)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Commodities & Forex -->
+    <div class="card-title" style="margin-bottom:10px; color:var(--text-secondary); font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">🛢️ Commodities &amp; Forex</div>
+    <div class="table-wrap" style="margin-bottom:20px;">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>API</th>
+            <th>Data Provided</th>
+            <th>Free Limit</th>
+            <th>Used For (Dashboard Section)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Metals-API</strong><br><span class="limit-note">metals-api.com</span></td>
+            <td>Gold, Silver, Platinum, Palladium prices (USD/oz)</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">50 requests/month</span></td>
+            <td>Commodities card (Gold, Silver)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>EIA API</strong><br><span class="limit-note">api.eia.gov</span></td>
+            <td>WTI crude, Brent crude, Natural Gas prices (US Energy Info Admin)</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">Unlimited (govt API)</span></td>
+            <td>Commodities card (WTI, Brent, Nat Gas), Energy &amp; Resources</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>Frankfurter</strong><br><span class="limit-note">frankfurter.app</span></td>
+            <td>EUR-based forex rates, 170+ currencies, history</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">Unlimited (open source)</span></td>
+            <td>Forex ticker in Stock Indexes card</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>Commodities-API</strong><br><span class="limit-note">commodities-api.com</span></td>
+            <td>Gold, Silver, Copper, Oil commodity rates</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">100 req/month</span></td>
+            <td>Commodities card (Copper, backup gold/silver)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- News -->
+    <div class="card-title" style="margin-bottom:10px; color:var(--text-secondary); font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">📰 News &amp; Media</div>
+    <div class="table-wrap" style="margin-bottom:20px;">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>API</th>
+            <th>Data Provided</th>
+            <th>Free Limit</th>
+            <th>Used For (Dashboard Section)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>GNews</strong><br><span class="limit-note">gnews.io</span></td>
+            <td>Top headlines by category &amp; keyword search</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">100 req/day</span></td>
+            <td>News card (Business, Tech, World, Science, Health)</td>
+            <td><span class="tag tag-green">Integrated</span></td>
+          </tr>
+          <tr>
+            <td><strong>NewsAPI.org</strong><br><span class="limit-note">newsapi.org</span></td>
+            <td>Global headlines, source filtering, keyword search</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">100 req/day (dev key)</span></td>
+            <td>Live News, Government, AI/ML, Finance, War, Climate cards</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>Currents API</strong><br><span class="limit-note">currentsapi.services</span></td>
+            <td>Worldwide news with language &amp; category filters</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">600 req/day</span></td>
+            <td>Region-based news cards (Americas, Asia, Europe, Mideast)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>Finnhub News</strong><br><span class="limit-note">finnhub.io/docs#market-news</span></td>
+            <td>Financial market news by category</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">Included in Finnhub free</span></td>
+            <td>Finance &amp; Energy news cards (market category filter)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Weather & Other -->
+    <div class="card-title" style="margin-bottom:10px; color:var(--text-secondary); font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">🌤️ Weather &amp; Other</div>
+    <div class="table-wrap" style="margin-bottom:20px;">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>API</th>
+            <th>Data Provided</th>
+            <th>Free Limit</th>
+            <th>Used For (Dashboard Section)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Open-Meteo</strong><br><span class="limit-note">open-meteo.com</span></td>
+            <td>Hourly weather, temperature, wind, humidity — no auth</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">Unlimited (open source)</span></td>
+            <td>Weather card (city search, current conditions)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>OpenWeatherMap</strong><br><span class="limit-note">openweathermap.org/api</span></td>
+            <td>Current weather, 5-day forecast, city search</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">1,000 req/day</span></td>
+            <td>Weather card (primary source, fallback to Open-Meteo)</td>
+            <td><span class="tag tag-amber">Planned</span></td>
+          </tr>
+          <tr>
+            <td><strong>YouTube Data API v3</strong><br><span class="limit-note">developers.google.com/youtube</span></td>
+            <td>Embedded live streams, video IDs</td>
+            <td><span class="free-badge">FREE</span><span class="limit-note">10,000 units/day</span></td>
+            <td>Live News (Regions) card, Live Webcam card</td>
+            <td><span class="tag tag-green">Integrated (embed only)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       4. CURRENT STATE
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s4">
+    <div class="section-heading"><span class="num">4</span> Current Implementation State</div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">Overall Progress</div>
+      <div class="progress-row">
+        <div class="progress-label">Authentication &amp; Users</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="progress-pct">100%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Dashboard UI / Layout</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="progress-pct">100%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">News Integration</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:85%"></div></div>
+        <div class="progress-pct">85%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Market Data (Stocks / Indexes)</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:90%"></div></div>
+        <div class="progress-pct">90%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Crypto Data</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:90%"></div></div>
+        <div class="progress-pct">90%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Commodities / Forex</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:85%"></div></div>
+        <div class="progress-pct">85%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Charts &amp; Technical Analysis</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:25%; background:linear-gradient(90deg,#78350f,#f59e0b)"></div></div>
+        <div class="progress-pct">25%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Weather Widget</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="progress-pct">100%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">3D Globe &amp; World Map</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="progress-pct">100%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Sector Heatmap</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="progress-pct">100%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">GitHub Pages Deployment</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="progress-pct">100%</div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label">Real-Time WebSocket</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" style="width:0%; background:linear-gradient(90deg,#450a0a,#ef4444)"></div></div>
+        <div class="progress-pct">0%</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">✅ What's Done</div>
+        <ul class="checklist">
+          <li><span class="check done">✓</span> JWT authentication (login + create-user)</li>
+          <li><span class="check done">✓</span> Protected route guard</li>
+          <li><span class="check done">✓</span> Dashboard with 21 draggable / resizable grid cards</li>
+          <li><span class="check done">✓</span> Layout persistence via localStorage</li>
+          <li><span class="check done">✓</span> Finnhub integration (India stocks sync + quote)</li>
+          <li><span class="check done">✓</span> GNews integration (News card, 5 categories)</li>
+          <li><span class="check done">✓</span> Exchange listing API (by country)</li>
+          <li><span class="check done">✓</span> YouTube embeds (Live News &amp; Webcam cards)</li>
+          <li><span class="check done">✓</span> Dark UI theme with Tailwind</li>
+          <li><span class="check done">✓</span> EF Core migrations (Users, Stocks, Exchanges)</li>
+          <li><span class="check done">✓</span> Stock Indexes — live via Yahoo Finance v8 + crumb auth</li>
+          <li><span class="check done">✓</span> Crypto — live via Yahoo Finance (BTC-USD, ETH-USD, SOL-USD…)</li>
+          <li><span class="check done">✓</span> Commodities — live via Yahoo Finance futures (GC=F, CL=F, NG=F…)</li>
+          <li><span class="check done">✓</span> Weather card — live OpenWeatherMap, debounced city search</li>
+          <li><span class="check done">✓</span> Sector Heatmap — live Alpha Vantage SECTOR endpoint</li>
+          <li><span class="check done">✓</span> All news category cards live (NewsAPI backend proxy, 15-min cache)</li>
+          <li><span class="check done">✓</span> Backend memory cache (per-endpoint TTL: 30s / 1min / 5min / 15min)</li>
+          <li><span class="check done">✓</span> 3D Globe card — day/night GLSL shader + NASA city lights texture</li>
+          <li><span class="check done">✓</span> World Map card — ESRI satellite tiles, clickable market markers</li>
+          <li><span class="check done">✓</span> GitHub Pages CI/CD (GitHub Actions → auto-deploy on push to main)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">🔲 Pending / Future</div>
+        <ul class="checklist">
+          <li><span class="check todo">○</span> Charts card — real OHLC history (Alpha Vantage TIME_SERIES_DAILY)</li>
+          <li><span class="check todo">○</span> AI Insights — Claude API integration</li>
+          <li><span class="check todo">○</span> Global search — wired to backend symbol search</li>
+          <li><span class="check todo">○</span> Real-time WebSocket price updates (Binance / Finnhub stream)</li>
+          <li><span class="check todo">○</span> Price alerts / notifications</li>
+          <li><span class="check todo">○</span> Portfolio tracker</li>
+          <li><span class="check todo">○</span> Mobile responsive layout</li>
+          <li><span class="check todo">○</span> Dark/light theme toggle</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       5. FEATURE TICKETS
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s5">
+    <div class="section-heading"><span class="num">5</span> Feature Tickets</div>
+
+    <div class="note-box">
+      Each ticket maps to a dashboard card or core system feature. Priority: P1 = Critical, P2 = High, P3 = Medium, P4 = Nice-to-have.
+    </div>
+
+    <!-- TICKET: Crypto -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-001</span>
+        <span class="ticket-title">Live Cryptocurrency Prices (Crypto Card)</span>
+        <span class="status-chip chip-green" style="font-size:11px;">P1 · Done ✓</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">APIs</span>
+          <span class="tag tag-green">CoinGecko (free)</span>
+          <span class="tag tag-teal">Binance WebSocket (free)</span>
+          <span class="tag tag-gray">CoinCap (fallback)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Coins</span>
+          <span class="ticket-val">Bitcoin (BTC), Ethereum (ETH), Solana (SOL), BNB, XRP, Dogecoin (DOGE)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Data</span>
+          <span class="ticket-val">Current price (USD), 24h change %, market cap, 7-day sparkline</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Update Rate</span>
+          <span class="ticket-val">30-second poll via CoinGecko REST; sub-second via Binance WebSocket stream (optional)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val">New <code>GET /api/crypto/prices</code> endpoint. Cache response 30s server-side to respect CoinGecko rate limits.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">CoinGecko URL</span>
+          <span class="ticket-val"><code>GET /coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,binancecoin,ripple,dogecoin</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: Stock Indexes -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-002</span>
+        <span class="ticket-title">Global Stock Indexes (Indexes Card)</span>
+        <span class="status-chip chip-green" style="font-size:11px;">P1 · Done ✓</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">APIs</span>
+          <span class="tag tag-green">Yahoo Finance / yfinance (free)</span>
+          <span class="tag tag-blue">Alpha Vantage (free 25/day)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Indexes</span>
+          <span class="ticket-val">S&amp;P 500 (^GSPC), NASDAQ (^IXIC), DOW (^DJI), FTSE 100 (^FTSE), DAX (^GDAXI), Nikkei 225 (^N225), Nifty 50 (^NSEI), Sensex (^BSESN), Hang Seng (^HSI)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Data</span>
+          <span class="ticket-val">Current value, open, previous close, change, change %, 52-week high/low</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/indexes</code> — proxy Yahoo Finance quote endpoint, cache 1-minute.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Note</span>
+          <span class="ticket-val">Yahoo Finance has no official free API. Use the unofficial quote endpoint or <code>yfinance</code> Python script called via backend proxy. Alpha Vantage as backup (25 req/day limit).</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: Commodities -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-003</span>
+        <span class="ticket-title">Commodities Prices (Commodities Card)</span>
+        <span class="status-chip chip-green" style="font-size:11px;">P1 · Done ✓</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">APIs</span>
+          <span class="tag tag-green">EIA API (free, unlimited — oil &amp; gas)</span>
+          <span class="tag tag-green">Metals-API (free 50/month — gold/silver)</span>
+          <span class="tag tag-teal">Frankfurter (free — USD conversions)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Commodities</span>
+          <span class="ticket-val">VIX (fear index), Gold (XAU/USD), Silver (XAG/USD), WTI Crude Oil, Brent Crude, Natural Gas, Copper</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">EIA Endpoint</span>
+          <span class="ticket-val"><code>GET https://api.eia.gov/v2/petroleum/pri/spt/data/?api_key={key}&frequency=daily</code></span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/commodities</code> — aggregate EIA + Metals-API, cache 5 minutes.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">VIX Source</span>
+          <span class="ticket-val">Yahoo Finance (<code>^VIX</code> symbol) via same index endpoint.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: Charts -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-004</span>
+        <span class="ticket-title">Historical Charts (Charts — Major Indexes Card)</span>
+        <span class="status-chip chip-amber" style="font-size:11px;">P1 · Pending</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">APIs</span>
+          <span class="tag tag-green">Alpha Vantage TIME_SERIES_DAILY (free)</span>
+          <span class="tag tag-blue">Polygon.io Aggregates (free, delayed)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Library</span>
+          <span class="ticket-val">Replace placeholder with <strong>Recharts</strong> or <strong>lightweight-charts</strong> (TradingView open-source) — both free</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Timeframes</span>
+          <span class="ticket-val">1D, 1W, 1M, 3M, 1Y — toggle buttons on chart card header</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Chart Types</span>
+          <span class="ticket-val">Line chart (default), Area chart, Candlestick OHLC (advanced toggle)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/charts/{symbol}?range=1M</code> — returns array of {date, open, high, low, close, volume}.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: Weather -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-005</span>
+        <span class="ticket-title">Weather Widget (Weather Card)</span>
+        <span class="status-chip chip-amber" style="font-size:11px;">P2 · Pending</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">APIs</span>
+          <span class="tag tag-green">OpenWeatherMap (free 1000/day)</span>
+          <span class="tag tag-teal">Open-Meteo (free, no key — fallback)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Data</span>
+          <span class="ticket-val">Temperature (°C/°F toggle), feels-like, humidity, wind speed, weather icon, 5-day forecast</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Search</span>
+          <span class="ticket-val">City name search with autocomplete. Default to user's last searched city (localStorage).</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/weather?city={name}</code> — proxy OWM, cache 10 minutes per city.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Note</span>
+          <span class="ticket-val">API key stored in backend <code>appsettings.json</code> / env var. Never exposed to client.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: News Categories -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-006</span>
+        <span class="ticket-title">News Category Cards (Finance, Tech, AI/ML, Climate, War, Govt, Energy)</span>
+        <span class="status-chip chip-amber" style="font-size:11px;">P2 · Pending</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">APIs</span>
+          <span class="tag tag-green">NewsAPI.org (free 100/day)</span>
+          <span class="tag tag-green">Currents API (free 600/day)</span>
+          <span class="tag tag-blue">Finnhub Market News (free)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Cards</span>
+          <span class="ticket-val">Finance, Technology, AI/ML, Climate, War/Conflict, Government/Policy, Energy &amp; Resources, Live News (by region)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Strategy</span>
+          <span class="ticket-val">Each card maps to keyword/category queries. Backend aggregates from multiple sources, deduplicates by URL, caches 15 minutes.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/news?category={category}&region={region}</code> — returns up to 10 articles with title, source, url, publishedAt, imageUrl.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Keyword Map</span>
+          <span class="ticket-val">
+            Finance → <code>business+finance</code> |
+            AI/ML → <code>artificial intelligence machine learning</code> |
+            Climate → <code>climate change environment</code> |
+            War → <code>conflict military geopolitics</code> |
+            Energy → <code>OPEC oil gas energy</code>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: Sector Heatmap -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-007</span>
+        <span class="ticket-title">Sector Performance Heatmap</span>
+        <span class="status-chip chip-amber" style="font-size:11px;">P2 · Pending</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">APIs</span>
+          <span class="tag tag-green">Finnhub (sector quotes via ETF proxy — free)</span>
+          <span class="tag tag-blue">Alpha Vantage SECTOR (free)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Sectors</span>
+          <span class="ticket-val">Technology, Healthcare, Financials, Energy, Consumer Discretionary, Industrials, Materials, Real Estate, Utilities, Communication Services</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Visual</span>
+          <span class="ticket-val">Color-coded grid — green (positive %) to red (negative %). Size of cell proportional to market cap weight.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Alpha Vantage</span>
+          <span class="ticket-val"><code>GET https://www.alphavantage.co/query?function=SECTOR&apikey={key}</code> — returns US sector performance for 1D, 5D, 1M, 3M, 1Y, 3Y</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/sectors</code> — cache 5 minutes.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: AI Insights -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-008</span>
+        <span class="ticket-title">AI Market Insights Card</span>
+        <span class="status-chip chip-purple" style="font-size:11px;">P3 · Future</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">Source</span>
+          <span class="tag tag-green">Claude API (free via Anthropic Console credits)</span>
+          <span class="tag tag-gray">OR static rule-based summaries (no API)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Content</span>
+          <span class="ticket-val">Daily market summary, top movers narrative, sentiment indicators, notable events</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Approach</span>
+          <span class="ticket-val">Generate once per day — use Claude API to summarize top headlines + market moves into 5-6 bullet insights. Cache result 24h.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/insights</code> — returns cached AI-generated summary. Regenerated via scheduled job at market open.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: WebSocket -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-009</span>
+        <span class="ticket-title">Real-Time Price Updates (WebSocket / SSE)</span>
+        <span class="status-chip chip-amber" style="font-size:11px;">P2 · Pending</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">Sources</span>
+          <span class="tag tag-green">Binance WebSocket (crypto — free)</span>
+          <span class="tag tag-blue">Finnhub WebSocket (stocks — free)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Approach</span>
+          <span class="ticket-val">Backend subscribes to Finnhub &amp; Binance WebSocket streams. Pushes updates to connected clients via <strong>Server-Sent Events (SSE)</strong> or <strong>SignalR</strong>. Avoids direct client WebSocket to external APIs (CORS/key security).</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/stream/prices</code> — SSE endpoint. Client subscribes once and receives price ticks for subscribed symbols.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Frontend</span>
+          <span class="ticket-val">Use <code>EventSource</code> API to connect to SSE endpoint. Update PriceGrid / IndexGrid components without full re-renders.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: Backend Caching -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-010</span>
+        <span class="ticket-title">Backend Response Caching (Rate-Limit Management)</span>
+        <span class="status-chip chip-amber" style="font-size:11px;">P1 · Required</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">Why</span>
+          <span class="ticket-val">All free APIs have low rate limits. Multiple dashboard users hitting the same endpoints would exhaust quotas quickly without caching.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Solution</span>
+          <span class="tag tag-green">IMemoryCache (.NET built-in — free)</span>
+          <span class="tag tag-gray">OR Redis (Docker, free self-hosted)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">TTL Strategy</span>
+          <span class="ticket-val">
+            Crypto: 30s |
+            Stocks/Indexes: 60s |
+            Commodities: 5min |
+            News: 15min |
+            Sectors: 5min |
+            Weather: 10min/city |
+            AI Insights: 24h
+          </span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Implementation</span>
+          <span class="ticket-val">Add <code>ICacheService</code> abstraction wrapping <code>IMemoryCache</code>. Inject into all market data services.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKET: Global Search -->
+    <div class="ticket">
+      <div class="ticket-header">
+        <span class="ticket-id">MP-011</span>
+        <span class="ticket-title">Global Search Bar (Dashboard Header)</span>
+        <span class="status-chip chip-purple" style="font-size:11px;">P3 · Future</span>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-label">APIs</span>
+          <span class="tag tag-green">Finnhub Symbol Search (free)</span>
+          <span class="tag tag-blue">CoinGecko coin search (free)</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Behaviour</span>
+          <span class="ticket-val">Type ticker/name → see matching stocks + crypto. Click result to open a detail modal with live quote + mini-chart.</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-label">Backend</span>
+          <span class="ticket-val"><code>GET /api/search?q={query}</code> — returns array of {symbol, name, type, exchange}. Debounce 300ms on frontend.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       6. DASHBOARD SECTIONS
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s6">
+    <div class="section-heading"><span class="num">6</span> Dashboard Cards — Data Source Map</div>
+
+    <!-- Legend -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;font-size:12px;align-items:center;">
+      <span style="color:var(--text-muted);">Legend:</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 4px rgba(239,68,68,.7);display:inline-block;animation:none;"></span>
+        <span style="color:var(--text-secondary);">Live dot = real API fetch</span>
+      </span>
+      <span class="tag tag-green">Done</span> <span style="color:var(--text-muted);">= live data wired</span>
+      <span class="tag tag-amber">Pending</span> <span style="color:var(--text-muted);">= dummy data / not yet wired</span>
+      <span class="tag tag-purple">Future</span> <span style="color:var(--text-muted);">= planned</span>
+    </div>
+
+    <div class="table-wrap">
+      <table class="api-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Card Name</th>
+            <th>Live Dot</th>
+            <th>API / Data Source</th>
+            <th>Endpoint</th>
+            <th>Update Freq</th>
+            <th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ── API-fetched cards ── -->
+          <tr>
+            <td>1</td>
+            <td><strong>Markets</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → Finnhub + EF Core DB</td>
+            <td><code>/api/exchanges</code></td>
+            <td>On demand</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><strong>News (tabbed)</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>GNews API — <code>VITE_GNEWS_API_KEY</code> (frontend)</td>
+            <td>GNews <code>/top-headlines</code> &amp; <code>/search</code></td>
+            <td>On tab change</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><strong>Live News (headlines)</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → NewsAPI.org (<code>top-headlines?category=world</code>)</td>
+            <td><code>/api/news?card=live-news</code></td>
+            <td>15 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><strong>Government / Policy</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → NewsAPI.org (<code>top-headlines?q=government policy</code>)</td>
+            <td><code>/api/news?card=government</code></td>
+            <td>15 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><strong>Energy &amp; Resources</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → NewsAPI.org (<code>top-headlines?q=energy oil gas OPEC</code>)</td>
+            <td><code>/api/news?card=energy</code></td>
+            <td>15 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><strong>Technology</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → NewsAPI.org (<code>top-headlines?category=technology</code>)</td>
+            <td><code>/api/news?card=technology</code></td>
+            <td>15 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td><strong>AI / ML News</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → NewsAPI.org (<code>top-headlines?q=artificial intelligence LLM</code>)</td>
+            <td><code>/api/news?card=ai-ml</code></td>
+            <td>15 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td><strong>Finance News</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → NewsAPI.org (<code>top-headlines?q=finance stock market</code>)</td>
+            <td><code>/api/news?card=finance</code></td>
+            <td>15 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td><strong>Climate News</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → NewsAPI.org (<code>top-headlines?q=climate change environment</code>)</td>
+            <td><code>/api/news?card=climate</code></td>
+            <td>15 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td><strong>War / Conflict</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → NewsAPI.org (<code>top-headlines?q=war military conflict</code>)</td>
+            <td><code>/api/news?card=war</code></td>
+            <td>15 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td><strong>Sector Heatmap</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → Alpha Vantage SECTOR (free 25/day)</td>
+            <td><code>/api/sectors</code></td>
+            <td>5 min poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td><strong>Weather</strong></td>
+            <td style="text-align:center;">🔴</td>
+            <td>Backend → OpenWeatherMap (free 1,000/day) — debounced on search</td>
+            <td><code>/api/weather?city=</code></td>
+            <td>On search (600ms debounce) + 10 min re-poll</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+
+          <!-- ── Static / dummy cards ── -->
+          <tr style="opacity:0.6;">
+            <td>13</td>
+            <td><strong>Live News — Regions</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>Hardcoded YouTube embed IDs (no API call)</td>
+            <td>—</td>
+            <td>Live stream</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr style="opacity:0.6;">
+            <td>14</td>
+            <td><strong>Live Webcam</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>Hardcoded YouTube embed IDs (no API call)</td>
+            <td>—</td>
+            <td>Live stream</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>15</td>
+            <td><strong>Stock Indexes</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>Live — Yahoo Finance v8 (crumb auth). ^GSPC, ^IXIC, ^DJI, ^NSEI, ^BSESN, ^FTSE, ^GDAXI, ^N225, ^HSI, ^AXJO, ^SSEC, VIX</td>
+            <td>—</td>
+            <td>1 min</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>16</td>
+            <td><strong>Commodities</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>Live — Yahoo Finance futures: GC=F (Gold), SI=F (Silver), CL=F (WTI), BZ=F (Brent), NG=F (NatGas), HG=F (Copper)</td>
+            <td>—</td>
+            <td>5 min</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>17</td>
+            <td><strong>Crypto</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>Live — Yahoo Finance: BTC-USD, ETH-USD, SOL-USD, BNB-USD, XRP-USD, DOGE-USD</td>
+            <td>—</td>
+            <td>30 s</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>18</td>
+            <td><strong>AI Insights</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>Static text — Claude API planned</td>
+            <td>—</td>
+            <td>Daily</td>
+            <td><span class="tag tag-purple">Future</span></td>
+          </tr>
+          <tr style="opacity:0.6;">
+            <td>19</td>
+            <td><strong>Charts — Major Indexes</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>Dummy data — Alpha Vantage TIME_SERIES_DAILY planned</td>
+            <td>—</td>
+            <td>On timeframe change</td>
+            <td><span class="tag tag-amber">Pending</span></td>
+          </tr>
+          <tr>
+            <td>20</td>
+            <td><strong>Global Markets — Live Earth (3D Globe)</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>react-globe.gl + custom GLSL day/night shader. NASA Blue Marble (day) + city lights (night). Animated trade arcs, financial hub markers, auto-rotate.</td>
+            <td>—</td>
+            <td>Solar pos: 1 min</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+          <tr>
+            <td>21</td>
+            <td><strong>World Markets Map (2D Satellite)</strong></td>
+            <td style="text-align:center;">—</td>
+            <td>Leaflet + ESRI World Imagery satellite tiles. Clickable market hub markers (hover tooltip: index, value, % change). Zoom/pan.</td>
+            <td>—</td>
+            <td>Static / on hover</td>
+            <td><span class="tag tag-green">Done</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       7. ARCHITECTURE
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s7">
+    <div class="section-heading"><span class="num">7</span> Architecture Overview</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">🗂️ Backend — Clean Architecture</div>
+        <div class="card-desc" style="font-family:'Courier New',monospace; font-size:12px; color:var(--blue-light); line-height:2;">
+          MarketPulse.API<br>
+          &nbsp;└─ Controllers (Auth, Markets, Crypto, Indexes,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp; Commodities, News, Weather, Sectors, Charts)<br>
+          MarketPulse.Application<br>
+          &nbsp;└─ Interfaces, DTOs, Options<br>
+          MarketPulse.Infrastructure<br>
+          &nbsp;└─ External API Clients (Finnhub, CoinGecko,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp; EIA, NewsAPI, OWM, AlphaVantage...)<br>
+          &nbsp;└─ Repositories (EF Core + SQL Server)<br>
+          &nbsp;└─ CacheService (IMemoryCache)<br>
+          MarketPulse.Domain<br>
+          &nbsp;└─ Entities (User, Stock, Exchange, Quote)
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">🌐 Data Flow</div>
+        <div class="card-desc" style="font-family:'Courier New',monospace; font-size:12px; color:var(--teal); line-height:2;">
+          Browser (React)<br>
+          &nbsp;&nbsp;↕ Vite Proxy (/api → localhost:5167)<br>
+          ASP.NET Core API<br>
+          &nbsp;&nbsp;↕ IMemoryCache (TTL-based)<br>
+          &nbsp;&nbsp;↕ HttpClient / WebSocket<br>
+          External Free APIs<br>
+          &nbsp;&nbsp;(Finnhub, CoinGecko, EIA,<br>
+          &nbsp;&nbsp;&nbsp;Alpha Vantage, NewsAPI, OWM...)<br>
+          SQL Server (LocalDB)
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>New controllers needed:</strong>
+      <code>CryptoController</code>, <code>IndexesController</code>, <code>CommoditiesController</code>,
+      <code>NewsController</code> (unified), <code>WeatherController</code>, <code>SectorsController</code>,
+      <code>ChartsController</code>, <code>SearchController</code>, <code>StreamController</code> (SSE).
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       8. NON-FUNCTIONAL REQUIREMENTS
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s8">
+    <div class="section-heading"><span class="num">8</span> Non-Functional Requirements</div>
+
+    <div class="nfr-grid">
+      <div class="nfr-card">
+        <h4>⚡ Performance</h4>
+        <ul>
+          <li>Dashboard initial load &lt; 2s on LAN</li>
+          <li>API response &lt; 200ms (from cache)</li>
+          <li>Real-time updates &lt; 1s latency</li>
+          <li>No render blocking on card load failure</li>
+        </ul>
+      </div>
+      <div class="nfr-card">
+        <h4>🔒 Security</h4>
+        <ul>
+          <li>All API keys stored server-side only</li>
+          <li>JWT tokens short-lived (15 min)</li>
+          <li>CORS locked to known origins</li>
+          <li>No sensitive data in frontend bundle</li>
+        </ul>
+      </div>
+      <div class="nfr-card">
+        <h4>♻️ Resilience</h4>
+        <ul>
+          <li>Each card fails independently (no cascading)</li>
+          <li>Fallback to cached/dummy data on API error</li>
+          <li>Retry with exponential backoff (Polly)</li>
+          <li>Rate limit errors handled gracefully (429 → use cache)</li>
+        </ul>
+      </div>
+      <div class="nfr-card">
+        <h4>📐 Scalability</h4>
+        <ul>
+          <li>Backend caching reduces external API calls by 90%+</li>
+          <li>Stateless API (JWT) — horizontally scalable</li>
+          <li>SSE preferred over polling where possible</li>
+          <li>Pagination on news &amp; stock list endpoints</li>
+        </ul>
+      </div>
+      <div class="nfr-card">
+        <h4>🧩 Maintainability</h4>
+        <ul>
+          <li>Each API client in its own infrastructure class</li>
+          <li>Feature flags for experimental cards</li>
+          <li>API keys configurable per environment</li>
+          <li>Swagger docs for all endpoints</li>
+        </ul>
+      </div>
+      <div class="nfr-card">
+        <h4>📱 Usability</h4>
+        <ul>
+          <li>Dark theme — accessible contrast ratios</li>
+          <li>Draggable layout saved per user</li>
+          <li>Responsive grid (tablet / desktop)</li>
+          <li>Card refresh without full page reload</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       9. DEVELOPMENT PHASES
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s9">
+    <div class="section-heading"><span class="num">9</span> Development Phases</div>
+
+    <div class="timeline">
+      <!-- Phase 0 -->
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-phase done">Phase 0 — Complete</div>
+        <div class="tl-title">Foundation &amp; Auth</div>
+        <ul class="tl-items">
+          <li>Clean architecture project setup (.NET 8 + React + Vite)</li>
+          <li>JWT authentication (login code system)</li>
+          <li>EF Core + SQL Server (LocalDB) + migrations</li>
+          <li>Dashboard grid layout with 18 card placeholders</li>
+          <li>Finnhub + GNews API integration (partial)</li>
+          <li>Vite proxy configuration</li>
+        </ul>
+      </div>
+
+      <!-- Phase 1 -->
+      <div class="tl-item">
+        <div class="tl-dot active"></div>
+        <div class="tl-phase active">Phase 1 — In Progress</div>
+        <div class="tl-title">Core Market Data (Free APIs)</div>
+        <ul class="tl-items">
+          <li>Backend caching layer (IMemoryCache with per-endpoint TTL)</li>
+          <li>CryptoController + CoinGecko client → live crypto card</li>
+          <li>IndexesController + Yahoo Finance → stock indexes card</li>
+          <li>CommoditiesController + EIA + Metals-API → commodities card</li>
+          <li>WeatherController + OpenWeatherMap → weather card</li>
+          <li>Replace all dummy data with live API responses</li>
+        </ul>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="tl-item">
+        <div class="tl-dot next"></div>
+        <div class="tl-phase next">Phase 2 — Next</div>
+        <div class="tl-title">News &amp; Charts</div>
+        <ul class="tl-items">
+          <li>Unified NewsController (NewsAPI + Currents + Finnhub News)</li>
+          <li>All 8 news category cards wired to real data</li>
+          <li>ChartsController + Alpha Vantage → historical OHLC charts</li>
+          <li>Replace IndexCharts placeholder with Recharts / lightweight-charts</li>
+          <li>SectorsController + Alpha Vantage SECTOR → heatmap</li>
+          <li>Global search wired to Finnhub + CoinGecko symbol search</li>
+        </ul>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="tl-item">
+        <div class="tl-dot later"></div>
+        <div class="tl-phase later">Phase 3 — Planned</div>
+        <div class="tl-title">Real-Time &amp; Advanced Features</div>
+        <ul class="tl-items">
+          <li>SSE streaming endpoint for live price ticks</li>
+          <li>Binance WebSocket → crypto real-time prices</li>
+          <li>Finnhub WebSocket → stock quote streams</li>
+          <li>Price alert system (threshold-based, toast notification)</li>
+          <li>Watchlist with localStorage persistence</li>
+          <li>Candlestick / OHLC chart mode</li>
+        </ul>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="tl-item">
+        <div class="tl-dot later"></div>
+        <div class="tl-phase later">Phase 4 — Future</div>
+        <div class="tl-title">Polish &amp; Production</div>
+        <ul class="tl-items">
+          <li>AI Insights card (Claude API daily summary)</li>
+          <li>Multi-user watchlist persistence (DB)</li>
+          <li>Rate limiting per user on API routes</li>
+          <li>Error boundaries in React for each card</li>
+          <li>Production Docker setup</li>
+          <li>CI/CD pipeline (GitHub Actions)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       10. CONSTRAINTS & RISKS
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="section" id="s10">
+    <div class="section-heading"><span class="num">10</span> Constraints &amp; Risks</div>
+
+    <div class="note-box warn">
+      <strong>⚠ Free API Rate Limits are the #1 risk.</strong> All external data sources operate on free tiers
+      with strict daily/monthly quotas. Server-side caching (Phase 1) is a hard prerequisite before wiring
+      real APIs to the dashboard — without it, a single page refresh can exhaust a daily quota.
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">📊 API Quota Summary</div>
+        <table style="width:100%; font-size:12px; border-collapse:collapse;">
+          <tr style="color:var(--text-muted); font-size:11px; text-transform:uppercase;">
+            <th style="text-align:left; padding:4px 0; border-bottom:1px solid var(--border);">API</th>
+            <th style="text-align:right; padding:4px 0; border-bottom:1px solid var(--border);">Free Limit</th>
+          </tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">Finnhub</td><td style="text-align:right; color:var(--green);">60 req/min</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">GNews</td><td style="text-align:right; color:var(--amber);">100 req/day</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">NewsAPI.org</td><td style="text-align:right; color:var(--amber);">100 req/day</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">CoinGecko</td><td style="text-align:right; color:var(--green);">30 req/min</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">Alpha Vantage</td><td style="text-align:right; color:var(--red);">25 req/day</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">Metals-API</td><td style="text-align:right; color:var(--red);">50 req/month</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">EIA (oil/gas)</td><td style="text-align:right; color:var(--green);">Unlimited</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">OpenWeatherMap</td><td style="text-align:right; color:var(--green);">1,000 req/day</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">Currents API</td><td style="text-align:right; color:var(--green);">600 req/day</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">Polygon.io</td><td style="text-align:right; color:var(--green);">Unlimited (delayed)</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">Open-Meteo</td><td style="text-align:right; color:var(--green);">Unlimited</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">Frankfurter</td><td style="text-align:right; color:var(--green);">Unlimited</td></tr>
+          <tr><td style="padding:5px 0; color:var(--text-secondary);">Binance WS</td><td style="text-align:right; color:var(--green);">Unlimited (public)</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px;">⚡ Risk Register</div>
+        <ul style="list-style:none; padding:0;">
+          <li style="padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary);"><strong style="color:var(--red)">HIGH</strong> — Yahoo Finance has no official API; unofficial endpoint may break</li>
+          <li style="padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary);"><strong style="color:var(--red)">HIGH</strong> — Alpha Vantage 25 req/day severely limits chart history calls</li>
+          <li style="padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary);"><strong style="color:var(--amber)">MED</strong> — Metals-API 50 req/month requires aggressive caching (1h+ TTL)</li>
+          <li style="padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary);"><strong style="color:var(--amber)">MED</strong> — NewsAPI.org only works for dev localhost on free tier</li>
+          <li style="padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--text-secondary);"><strong style="color:var(--amber)">MED</strong> — GNews 100/day shared across all users of the deployment</li>
+          <li style="padding:6px 0; font-size:13px; color:var(--text-secondary);"><strong style="color:var(--green)">LOW</strong> — Binance / CoinGecko / EIA have generous free tiers, low risk</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note-box" style="margin-top:16px;">
+      <strong>Mitigation:</strong> All API keys are stored in <code>appsettings.json</code> / environment variables (never the client bundle).
+      Server-side caching is mandatory before production. Free-tier APIs that are too restrictive (Alpha Vantage, Metals-API)
+      will use longer cache TTLs and fallback to dummy/last-known data when quota is exhausted.
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="doc-footer">
+    <div class="doc-footer-left">
+      MarketPulse — Project Ticket &amp; SRS v1.0 &nbsp;·&nbsp; April 4, 2026 &nbsp;·&nbsp; All APIs: Free Tier Only
+    </div>
+    <div class="doc-footer-right">
+      Project ID: <span>MP-2026</span> &nbsp;·&nbsp; 11 Feature Tickets &nbsp;·&nbsp; 19 Dashboard Cards
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -14,7 +14,9 @@ import { PageLoader } from '../components/common';
 import {
   DashboardCard,
   DashboardHeader,
+  GlobeCard,
   HeadlinesList,
+  WorldMapCard,
   IndexCharts,
   IndexGrid,
   NewsGrid,
@@ -26,7 +28,6 @@ import {
   dummyCommodities,
   dummyCrypto,
   dummyNews,
-  dummyNewsChannels,
   liveNewsRegions,
   liveNewsByRegion,
   dummyGovernment,
@@ -45,6 +46,18 @@ import {
   liveWebcamGridRegions,
   weatherCities,
 } from '../data/dashboardDummyData';
+import {
+  NEWS_CATEGORIES,
+  useLiveNews,
+  useLiveNewsByCategory,
+  useLiveNewsByQuery,
+  useBackendNews,
+  useLiveWeather,
+  useSectorPerformance,
+  useIndexes,
+  useCrypto,
+  useCommodities,
+} from '../api/newsApi';
 
 const LAYOUT_STORAGE_KEY = 'marketpulse-dashboard-layout';
 
@@ -70,6 +83,8 @@ const ALL_LAYOUT_KEYS: LayoutItem[] = [
   { i: 'climate', x: 8, y: 9, w: 2, h: 2 },
   { i: 'war', x: 10, y: 9, w: 2, h: 2 },
   { i: 'weather', x: 0, y: 11, w: 2, h: 2 },
+  { i: 'globe',     x: 2, y: 11, w: 4, h: 4 },
+  { i: 'world-map', x: 6, y: 11, w: 6, h: 4 },
 ];
 
 function loadStoredLayout(): LayoutItem[] {
@@ -107,26 +122,50 @@ export function DashboardPage() {
   const [loadingCountries, setLoadingCountries] = useState(false);
   const [loadingExchanges, setLoadingExchanges] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [newsChannel, setNewsChannel] = useState<string>(dummyNewsChannels[0]);
+  const [newsCategory, setNewsCategory] = useState<string>(NEWS_CATEGORIES[0]);
   const [liveNewsRegion, setLiveNewsRegion] = useState<string>('All');
   const [videoRegion, setVideoRegion] = useState<string>('All');
   const [webcamLocation, setWebcamLocation] = useState<string>('All');
-  const [weatherSearch, setWeatherSearch] = useState<string>('');
   const navigate = useNavigate();
 
-  const filteredNews = dummyNews.filter((n) => n.source === newsChannel);
-  const newsToShow = filteredNews.length > 0 ? filteredNews : dummyNews;
+  // Main news card — GNews (frontend key)
+  const { items: newsToShow } = useLiveNews(newsCategory, dummyNews);
+
+  // Category news cards — backend-proxied NewsAPI (15-min server cache, auto-poll)
+  const { items: govNews, loading: govLoading }     = useBackendNews('government', dummyGovernment);
+  const { items: energyNews, loading: energyLoading } = useBackendNews('energy', dummyEnergy);
+  const { items: techNews, loading: techLoading }   = useBackendNews('technology', dummyTechnology);
+  const { items: aiMlNews, loading: aiMlLoading }   = useBackendNews('ai-ml', dummyAiMl);
+  const { items: financeNews, loading: financeLoading } = useBackendNews('finance', dummyFinance);
+  const { items: climateNews, loading: climateLoading } = useBackendNews('climate', dummyClimate);
+  const { items: warNews, loading: warLoading }     = useBackendNews('war', dummyWar);
+  const { items: liveHeadlines, loading: liveHeadlinesLoading } = useBackendNews('live-news', liveNewsByRegion[liveNewsRegion] ?? liveNewsByRegion.All);
+
+  // Sector heatmap — Alpha Vantage (5-min server cache)
+  const { rows: sectorRows, loading: sectorLoading } = useSectorPerformance(dummySectorHeatmap);
+
+  // Stock Indexes — Yahoo Finance (1-min server cache)
+  const { rows: indexRows, loading: indexLoading } = useIndexes(
+    dummyStockIndexes.map((r) => ({ symbol: r.name, name: r.name, country: r.country, value: r.value, changePercent: r.changePercent }))
+  );
+
+  // Crypto — CoinGecko (30-sec server cache)
+  const { rows: cryptoRows, loading: cryptoLoading } = useCrypto(
+    dummyCrypto.map((r) => ({ symbol: r.symbol, name: r.name, price: r.price, changePercent: r.changePercent, marketCap: 0 }))
+  );
+
+  // Commodities — EIA (5-min server cache)
+  const { rows: commodityRows, loading: commodityLoading } = useCommodities(
+    dummyCommodities.map((r) => ({ symbol: r.symbol, name: r.name, price: r.price, changePercent: r.changePercent }))
+  );
+
+  // Weather — OpenWeatherMap per searched city (10-min server cache)
+  const [weatherCity, setWeatherCity] = useState('');
+  const { data: liveWeatherData, loading: weatherLoading } = useLiveWeather(weatherCity);
+
   const liveNewsItems = liveNewsByRegion[liveNewsRegion] ?? liveNewsByRegion.All;
   const videoId = liveNewsVideoIds[videoRegion] ?? liveNewsVideoIds.All;
   const webcamId = liveWebcamIds[webcamLocation] ?? liveWebcamIds.Mideast;
-  const weatherSearchLower = weatherSearch.trim().toLowerCase();
-  const filteredWeatherCities = weatherSearchLower
-    ? weatherCities.filter(
-        (c) =>
-          c.name.toLowerCase().includes(weatherSearchLower) ||
-          c.country.toLowerCase().includes(weatherSearchLower)
-      )
-    : weatherCities;
 
   const loadCountries = useCallback(() => {
     return getExchangeCountries()
@@ -321,6 +360,7 @@ export function DashboardPage() {
             <DashboardCard
               title="Markets"
               badge="LIVE"
+              live
               headerRight={countryDropdown}
               onRefresh={handleRefresh}
               refreshing={refreshing}
@@ -354,47 +394,65 @@ export function DashboardPage() {
           </div>
 
           <div key="indexes" className={cardClassName}>
-            <DashboardCard title="Stock Indexes" badge="LIVE" dragHandle>
-              <div className={scrollClassName}>
-                <IndexGrid rows={dummyStockIndexes} />
-              </div>
+            <DashboardCard title="Stock Indexes" badge="LIVE" live dragHandle>
+              {indexLoading ? (
+                <div className="flex items-center justify-center py-6 text-text-secondary">
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                </div>
+              ) : (
+                <div className={scrollClassName}>
+                  <IndexGrid rows={indexRows.map((r) => ({ name: r.name, country: r.country, value: r.value, changePercent: r.changePercent }))} />
+                </div>
+              )}
             </DashboardCard>
           </div>
 
           <div key="commodities" className={cardClassName}>
-            <DashboardCard title="Commodities" badge="LIVE" dragHandle>
-              <div className={scrollClassName}>
-                <PriceGrid
-                  rows={dummyCommodities}
-                  formatPrice={(p) =>
-                    `$${p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                  }
-                />
-              </div>
+            <DashboardCard title="Commodities" badge="LIVE" live dragHandle>
+              {commodityLoading ? (
+                <div className="flex items-center justify-center py-6 text-text-secondary">
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                </div>
+              ) : (
+                <div className={scrollClassName}>
+                  <PriceGrid
+                    rows={commodityRows.map((r) => ({ symbol: r.symbol, name: r.name, price: r.price, changePercent: r.changePercent }))}
+                    formatPrice={(p) =>
+                      `$${p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    }
+                  />
+                </div>
+              )}
             </DashboardCard>
           </div>
 
           <div key="crypto" className={cardClassName}>
-            <DashboardCard title="Crypto" badge="LIVE" dragHandle>
-              <div className={scrollClassName}>
-                <PriceGrid
-                  rows={dummyCrypto}
-                  formatPrice={(p) =>
-                    `$${p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                  }
-                />
-              </div>
+            <DashboardCard title="Crypto" badge="LIVE" live dragHandle>
+              {cryptoLoading ? (
+                <div className="flex items-center justify-center py-6 text-text-secondary">
+                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                </div>
+              ) : (
+                <div className={scrollClassName}>
+                  <PriceGrid
+                    rows={cryptoRows.map((r) => ({ symbol: r.symbol, name: r.name, price: r.price, changePercent: r.changePercent }))}
+                    formatPrice={(p) =>
+                      `$${p.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    }
+                  />
+                </div>
+              )}
             </DashboardCard>
           </div>
 
           <div key="news" className={cardClassName}>
-            <DashboardCard title="News" badge="LIVE" dragHandle>
+            <DashboardCard title="News" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
                 <NewsGrid
                   items={newsToShow}
-                  channels={dummyNewsChannels}
-                  activeChannel={newsChannel}
-                  onChannelChange={setNewsChannel}
+                  channels={[...NEWS_CATEGORIES]}
+                  activeChannel={newsCategory}
+                  onChannelChange={setNewsCategory}
                 />
               </div>
             </DashboardCard>
@@ -413,7 +471,7 @@ export function DashboardPage() {
           </div>
 
           <div key="live-news" className={cardClassName}>
-            <DashboardCard title="Live News" badge="LIVE" dragHandle>
+            <DashboardCard title="Live News" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
                 <div className="flex flex-wrap gap-0.5 border-b border-border pb-1 mb-1">
                   {liveNewsRegions.map((r) => (
@@ -431,61 +489,103 @@ export function DashboardPage() {
                     </button>
                   ))}
                 </div>
-                <HeadlinesList items={liveNewsItems} />
+                {liveHeadlinesLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <HeadlinesList items={liveHeadlines} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="government" className={cardClassName}>
-            <DashboardCard title="Government" badge="LIVE" dragHandle>
+            <DashboardCard title="Government" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
-                <HeadlinesList items={dummyGovernment} />
+                {govLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <HeadlinesList items={govNews} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="energy" className={cardClassName}>
-            <DashboardCard title="Energy & Resources" badge="LIVE" dragHandle>
+            <DashboardCard title="Energy & Resources" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
-                <HeadlinesList items={dummyEnergy} />
+                {energyLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <HeadlinesList items={energyNews} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="technology" className={cardClassName}>
-            <DashboardCard title="Technology" badge="LIVE" dragHandle>
+            <DashboardCard title="Technology" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
-                <HeadlinesList items={dummyTechnology} />
+                {techLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <HeadlinesList items={techNews} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="sector-heatmap" className={cardClassName}>
-            <DashboardCard title="Sector Heatmap" badge="LIVE" dragHandle>
+            <DashboardCard title="Sector Heatmap" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
-                <SectorHeatmap rows={dummySectorHeatmap} />
+                {sectorLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <SectorHeatmap rows={sectorRows} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="ai-ml" className={cardClassName}>
-            <DashboardCard title="AI/ML" badge="LIVE" dragHandle>
+            <DashboardCard title="AI/ML" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
-                <HeadlinesList items={dummyAiMl} />
+                {aiMlLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <HeadlinesList items={aiMlNews} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="finance" className={cardClassName}>
-            <DashboardCard title="Finance" badge="LIVE" dragHandle>
+            <DashboardCard title="Finance" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
-                <HeadlinesList items={dummyFinance} />
+                {financeLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <HeadlinesList items={financeNews} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="index-charts" className={cardClassName}>
-            <DashboardCard title="Charts — Major Indexes" badge="LIVE" dragHandle>
+            <DashboardCard title="Charts — Major Indexes" dragHandle>
               <div className={scrollClassName}>
                 <IndexCharts labels={dummyIndexChartLabels} values={dummyIndexChartValues} />
               </div>
@@ -493,64 +593,161 @@ export function DashboardPage() {
           </div>
 
           <div key="climate" className={cardClassName}>
-            <DashboardCard title="Climate" badge="LIVE" dragHandle>
+            <DashboardCard title="Climate" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
-                <HeadlinesList items={dummyClimate} />
+                {climateLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <HeadlinesList items={climateNews} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="war" className={cardClassName}>
-            <DashboardCard title="War" badge="LIVE" dragHandle>
+            <DashboardCard title="War" badge="LIVE" live dragHandle>
               <div className={scrollClassName}>
-                <HeadlinesList items={dummyWar} />
+                {warLoading ? (
+                  <div className="flex justify-center py-4">
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent text-text-secondary" />
+                  </div>
+                ) : (
+                  <HeadlinesList items={warNews} />
+                )}
               </div>
             </DashboardCard>
           </div>
 
           <div key="weather" className={cardClassName}>
-            <DashboardCard title="Weather" badge="LIVE" dragHandle>
+            <DashboardCard title="Weather" badge="LIVE" live dragHandle>
               <div className="flex flex-col h-full min-h-0">
-                <input
-                  type="search"
-                  value={weatherSearch}
-                  onChange={(e) => setWeatherSearch(e.target.value)}
-                  placeholder="Search city or country..."
-                  className="mb-2 w-full rounded border border-border bg-background-primary px-2 py-1.5 text-xs text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
-                  aria-label="Search city or country"
-                />
+                {/* Search input */}
+                <div className="relative mb-2 shrink-0">
+                  <input
+                    type="text"
+                    value={weatherCity}
+                    onChange={(e) => setWeatherCity(e.target.value)}
+                    placeholder="Search city (e.g. London)..."
+                    className="w-full rounded border border-border bg-background-primary px-2 py-1.5 pr-6 text-xs text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+                    aria-label="Search city"
+                  />
+                  {weatherCity && (
+                    <button
+                      type="button"
+                      onClick={() => setWeatherCity('')}
+                      className="absolute right-1.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                      aria-label="Clear"
+                    >
+                      <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+
                 <div className={scrollClassName}>
-                  <div className="divide-y divide-border">
-                    {filteredWeatherCities.length === 0 ? (
-                      <div className="py-3 text-center text-xs text-text-secondary">No cities match</div>
-                    ) : (
-                      filteredWeatherCities.map((c) => (
+                  {/* Loading spinner while debounce + fetch is in flight */}
+                  {weatherLoading && (
+                    <div className="flex items-center justify-center py-6">
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+                    </div>
+                  )}
+
+                  {/* API result — shown above the default list when a city was searched */}
+                  {!weatherLoading && liveWeatherData && (
+                    <>
+                      {/* Live result row */}
+                      <div className="mb-2 rounded border border-accent/30 bg-accent/5 px-2 py-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="text-xs font-semibold text-text-primary">
+                              {liveWeatherData.city}, {liveWeatherData.country}
+                            </div>
+                            <div className="mt-0.5 text-[10px] capitalize text-text-secondary">
+                              {liveWeatherData.condition}
+                            </div>
+                            <div className="mt-0.5 text-[10px] text-text-secondary">
+                              Feels {liveWeatherData.feelsLikeC}°C · H {liveWeatherData.highC}° L {liveWeatherData.lowC}°
+                            </div>
+                            <div className="mt-0.5 text-[10px] text-text-secondary">
+                              Humidity {liveWeatherData.humidity}% · Wind {liveWeatherData.windKmh} km/h
+                            </div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <div className="text-lg font-bold leading-none text-text-primary">
+                              {liveWeatherData.tempC}°C
+                            </div>
+                            <div className="mt-1 text-[9px] font-medium uppercase tracking-wide text-accent">
+                              Live
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Default city list below the live result */}
+                      <div className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-text-muted">
+                        Quick picks
+                      </div>
+                      <div className="divide-y divide-border">
+                        {weatherCities.map((c) => (
+                          <div
+                            key={c.id}
+                            className="flex cursor-pointer items-center justify-between rounded px-1 py-1.5 hover:bg-background-primary/60"
+                            onClick={() => setWeatherCity(c.name)}
+                          >
+                            <div className="min-w-0 truncate">
+                              <div className="text-xs font-medium text-text-primary">{c.name}, {c.country}</div>
+                              <div className="truncate text-[10px] text-text-secondary">{c.condition} · H {c.highC}° L {c.lowC}°</div>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <span className="text-xs font-medium text-text-primary">{c.tempC}°C</span>
+                              <span className="ml-1 text-[10px] text-text-secondary">{c.humidity}%</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Default list only — no search active */}
+                  {!weatherLoading && !liveWeatherData && (
+                    <div className="divide-y divide-border">
+                      {weatherCities.map((c) => (
                         <div
                           key={c.id}
-                          className="flex items-center justify-between py-1.5 first:pt-0 last:pb-0"
+                          className="flex cursor-pointer items-center justify-between rounded px-1 py-1.5 hover:bg-background-primary/60"
+                          onClick={() => setWeatherCity(c.name)}
                         >
                           <div className="min-w-0 truncate">
-                            <div className="text-xs font-medium text-text-primary">
-                              {c.name}, {c.country}
-                            </div>
-                            <div className="truncate text-[10px] text-text-secondary">
-                              {c.condition} · H {c.highC}° L {c.lowC}°
-                            </div>
+                            <div className="text-xs font-medium text-text-primary">{c.name}, {c.country}</div>
+                            <div className="truncate text-[10px] text-text-secondary">{c.condition} · H {c.highC}° L {c.lowC}°</div>
                           </div>
                           <div className="flex shrink-0 items-baseline gap-1 text-right">
                             <span className="text-xs font-medium text-text-primary">{c.tempC}°C</span>
-                            <span className="text-[10px] text-text-secondary">
-                              {c.humidity}% · {c.windKmh} km/h
-                            </span>
+                            <span className="text-[10px] text-text-secondary">{c.humidity}% · {c.windKmh} km/h</span>
                           </div>
                         </div>
-                      ))
-                    )}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </DashboardCard>
           </div>
+          <div key="globe" className={cardClassName}>
+            <DashboardCard title="Global Markets — Live Earth" dragHandle>
+              <GlobeCard />
+            </DashboardCard>
+          </div>
+
+          <div key="world-map" className={cardClassName}>
+            <DashboardCard title="World Markets Map" dragHandle>
+              <WorldMapCard />
+            </DashboardCard>
+          </div>
+
         </GridLayout>
         )}
         </div>

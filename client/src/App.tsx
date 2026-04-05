@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+// On GitHub Pages the app is served from /<repo-name>/ — pick up the base from Vite
+const BASE = import.meta.env.BASE_URL ?? '/';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
@@ -9,7 +11,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={BASE}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/create-user" element={<CreateUserPage />} />
