@@ -1,12 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import React, { useCallback, useState } from 'react';
 import GridLayout, { useContainerWidth } from 'react-grid-layout';
-import {
-  getExchangeCountries,
-  getExchangesByCountry,
-  type CountryDto,
-  type ExchangeDto,
-} from '../api/client';
 import {
   DashboardCard,
   DashboardHeader,
@@ -54,6 +47,39 @@ import {
 } from '../api/newsApi';
 
 const LAYOUT_STORAGE_KEY = 'marketpulse-dashboard-layout';
+
+const STATIC_EXCHANGES = [
+  { code: 'NYSE',    name: 'New York Stock Exchange',       country: 'US' },
+  { code: 'NASDAQ',  name: 'NASDAQ',                        country: 'US' },
+  { code: 'LSE',     name: 'London Stock Exchange',         country: 'UK' },
+  { code: 'TSE',     name: 'Tokyo Stock Exchange',          country: 'JP' },
+  { code: 'SSE',     name: 'Shanghai Stock Exchange',       country: 'CN' },
+  { code: 'SZSE',    name: 'Shenzhen Stock Exchange',       country: 'CN' },
+  { code: 'HKEX',    name: 'Hong Kong Stock Exchange',      country: 'HK' },
+  { code: 'Euronext',name: 'Euronext',                      country: 'EU' },
+  { code: 'DB',      name: 'Deutsche Börse (XETRA)',        country: 'DE' },
+  { code: 'BSE',     name: 'Bombay Stock Exchange',         country: 'IN' },
+  { code: 'NSE',     name: 'National Stock Exchange',       country: 'IN' },
+  { code: 'TSX',     name: 'Toronto Stock Exchange',        country: 'CA' },
+  { code: 'ASX',     name: 'Australian Securities Exchange',country: 'AU' },
+  { code: 'KRX',     name: 'Korea Exchange',                country: 'KR' },
+  { code: 'SGX',     name: 'Singapore Exchange',            country: 'SG' },
+  { code: 'BOVESPA', name: 'B3 Brasil Bolsa Balcão',        country: 'BR' },
+  { code: 'SIX',     name: 'SIX Swiss Exchange',            country: 'CH' },
+  { code: 'Borsa',   name: 'Borsa Italiana',                country: 'IT' },
+  { code: 'MOEX',    name: 'Moscow Exchange',               country: 'RU' },
+  { code: 'TASE',    name: 'Tel Aviv Stock Exchange',       country: 'IL' },
+  { code: 'JSE',     name: 'Johannesburg Stock Exchange',   country: 'ZA' },
+  { code: 'BMV',     name: 'Bolsa Mexicana de Valores',     country: 'MX' },
+  { code: 'IDX',     name: 'Indonesia Stock Exchange',      country: 'ID' },
+  { code: 'SET',     name: 'Stock Exchange of Thailand',    country: 'TH' },
+  { code: 'PSE',     name: 'Philippine Stock Exchange',     country: 'PH' },
+  { code: 'KLSE',    name: 'Bursa Malaysia',                country: 'MY' },
+  { code: 'NZX',     name: 'New Zealand Exchange',          country: 'NZ' },
+  { code: 'TADAWUL', name: 'Saudi Exchange',                country: 'SA' },
+  { code: 'DFM',     name: 'Dubai Financial Market',        country: 'AE' },
+  { code: 'QSE',     name: 'Qatar Stock Exchange',          country: 'QA' },
+] as const;
 
 type LayoutItem = { i: string; x: number; y: number; w: number; h: number };
 
@@ -109,12 +135,6 @@ function saveLayout(layout: LayoutItem[]) {
 export function DashboardPage() {
   const { width, containerRef, mounted } = useContainerWidth();
   const [layout, setLayout] = useState<LayoutItem[]>(loadStoredLayout);
-  const [countries, setCountries] = useState<CountryDto[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<string>('');
-  const [exchanges, setExchanges] = useState<ExchangeDto[]>([]);
-  const [loadingCountries, setLoadingCountries] = useState(false);
-  const [loadingExchanges, setLoadingExchanges] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [newsCategory, setNewsCategory] = useState<string>(NEWS_CATEGORIES[0]);
   const [liveNewsRegion, setLiveNewsRegion] = useState<string>('All');
   const [videoRegion, setVideoRegion] = useState<string>('All');
@@ -158,56 +178,11 @@ export function DashboardPage() {
   const videoId = liveNewsVideoIds[videoRegion] ?? liveNewsVideoIds.All;
   const webcamId = liveWebcamIds[webcamLocation] ?? liveWebcamIds.Mideast;
 
-  const loadCountries = useCallback(() => {
-    return getExchangeCountries()
-      .then(setCountries)
-      .catch(() => toast.error('Failed to load countries.'));
-  }, []);
-
-  const loadExchanges = useCallback(() => {
-    return getExchangesByCountry(selectedCountry || null)
-      .then(setExchanges)
-      .catch(() => toast.error('Failed to load exchanges.'));
-  }, [selectedCountry]);
-
-  useEffect(() => {
-    setLoadingCountries(true);
-    loadCountries().finally(() => setLoadingCountries(false));
-  }, [loadCountries]);
-
-  useEffect(() => {
-    setLoadingExchanges(true);
-    loadExchanges().finally(() => setLoadingExchanges(false));
-  }, [selectedCountry, loadExchanges]);
-
   const handleLayoutChange = useCallback((newLayout: ReadonlyArray<LayoutItem>) => {
     const next = newLayout.map((item) => ({ i: item.i, x: item.x, y: item.y, w: item.w, h: item.h }));
     setLayout(next);
     saveLayout(next);
   }, []);
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    Promise.all([loadCountries(), loadExchanges()]).finally(() => setRefreshing(false));
-  };
-
-  const countryDropdown = (
-    <select
-      id="country-select"
-      value={selectedCountry}
-      onChange={(e) => setSelectedCountry(e.target.value)}
-      disabled={loadingCountries}
-      className="max-w-[140px] rounded border border-border bg-background-primary px-2 py-1 text-xs text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
-      title="Country"
-    >
-      <option value="">All</option>
-      {countries.map((c) => (
-        <option key={c.countryCode} value={c.countryCode}>
-          {c.countryCode}
-        </option>
-      ))}
-    </select>
-  );
 
   const cardClassName = 'h-full min-h-0 flex flex-col';
   const scrollClassName = 'scrollbar-invisible flex-1 min-h-0 overflow-y-auto';
@@ -325,39 +300,24 @@ export function DashboardPage() {
           </div>
 
           <div key="markets" className={cardClassName}>
-            <DashboardCard
-              title="Markets"
-              badge="LIVE"
-              live
-              headerRight={countryDropdown}
-              onRefresh={handleRefresh}
-              refreshing={refreshing}
-              dragHandle
-            >
-              {loadingExchanges ? (
-                <div className="flex items-center justify-center py-6 text-text-secondary">
-                  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                </div>
-              ) : (
-                <div className={scrollClassName}>
-                  {exchanges.length === 0 ? (
-                    <div className="py-4 text-center text-xs text-text-secondary">No exchanges</div>
-                  ) : (
-                    <div className="divide-y divide-border">
-                      {exchanges.map((ex) => (
-                        <div
-                          key={ex.id}
-                          className="truncate py-1.5 text-xs text-text-primary"
-                          title={`${ex.code} — ${ex.name}`}
-                        >
-                          <span className="font-medium">{ex.code}</span>
-                          <span className="ml-1 text-text-secondary">— {ex.name}</span>
-                        </div>
-                      ))}
+            <DashboardCard title="Markets" dragHandle>
+              <div className={scrollClassName}>
+                <div className="divide-y divide-border">
+                  {STATIC_EXCHANGES.map((ex) => (
+                    <div
+                      key={ex.code}
+                      className="flex items-center justify-between py-1.5 text-xs"
+                      title={`${ex.code} — ${ex.name}`}
+                    >
+                      <div className="min-w-0 truncate">
+                        <span className="font-medium text-text-primary">{ex.code}</span>
+                        <span className="ml-1 text-text-secondary truncate">— {ex.name}</span>
+                      </div>
+                      <span className="ml-2 shrink-0 text-[10px] text-text-secondary">{ex.country}</span>
                     </div>
-                  )}
+                  ))}
                 </div>
-              )}
+              </div>
             </DashboardCard>
           </div>
 
