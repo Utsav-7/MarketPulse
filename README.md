@@ -1,6 +1,6 @@
 # MarketPulse
 
-<img width="1920" height="967" alt="MarketPulse Dashboard" src="https://github.com/user-attachments/assets/85709690-46b2-4aa5-ab98-79f6284c5239" />
+<img width="1901" height="971" alt="image" src="https://github.com/user-attachments/assets/5c78d9b2-43da-4c91-84f9-5284755edefb" />
 
 ---
 
